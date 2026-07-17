@@ -1,0 +1,27 @@
+name: sagesse_bitachon
+description: "Lecture aléatoire des phrases du Shaar HaBitachon (Chovot HaLevavot)."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  flutter_local_notifications: ^19.0.0
+  flutter_timezone: ^4.1.0
+  shared_preferences: ^2.5.3
+  timezone: ^0.10.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/phrases.json

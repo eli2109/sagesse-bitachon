@@ -43,3 +43,9 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Web Push secrets (never commit private keys)
+push-server/.dev.vars
+push-server/.wrangler/
+push-server/node_modules/
+*.vapid.private

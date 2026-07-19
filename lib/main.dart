@@ -1,13 +1,19 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'services/font_size_service.dart';
 import 'services/notification_service.dart';
 import 'services/phrase_service.dart';
+import 'services/web_push_service.dart';
 import 'widgets/phrase_display.dart';
+import 'widgets/reminder_sheet.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationService.instance.initialize();
+  if (kIsWeb) {
+    await WebPushService.instance.loadConfig();
+  }
   runApp(const SagesseBitachonApp());
 }
 
@@ -78,10 +84,18 @@ class _ReadingScreenState extends State<ReadingScreen> {
   Future<void> _showWelcomeDialog() async {
     if (!mounted) return;
 
-    final reminderLine = NotificationService.instance.isSupported
-        ? '\n\nUn rappel vous sera envoyé toutes les 3 heures pour ouvrir l\'application.'
-        : '\n\nVotre progression est mémorisée dans ce navigateur '
-            '(même après fermeture de l\'onglet).';
+    final String reminderLine;
+    if (NotificationService.instance.isSupported) {
+      reminderLine =
+          '\n\nUn rappel local vous sera envoyé toutes les 3 heures (Android).';
+    } else if (kIsWeb) {
+      reminderLine =
+          '\n\nVotre progression est mémorisée dans ce navigateur.\n\n'
+          'Pour des rappels sur iPhone : ajoutez l’app à l’écran d’accueil, '
+          'puis activez les notifications via l’icône cloche.';
+    } else {
+      reminderLine = '\n\nVotre progression est sauvegardée localement.';
+    }
 
     await showDialog<void>(
       context: context,
@@ -171,6 +185,16 @@ class _ReadingScreenState extends State<ReadingScreen> {
         title: const Text('Sagesse du Bitachon'),
         centerTitle: true,
         actions: [
+          if (kIsWeb)
+            IconButton(
+              tooltip: 'Rappels / notifications',
+              onPressed: () => showReminderSheet(context),
+              icon: Icon(
+                WebPushService.instance.isEnabled
+                    ? Icons.notifications_active_outlined
+                    : Icons.notifications_none_outlined,
+              ),
+            ),
           IconButton(
             tooltip: 'Réduire la police',
             onPressed: _fontSizeService.canDecrease ? _decreaseFontSize : null,

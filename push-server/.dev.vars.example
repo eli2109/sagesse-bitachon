@@ -1,0 +1,5 @@
+VAPID_PUBLIC_KEY=BDOHuJxy-7QveDgDGewF8cj3b9zMjuTl3lpwEfZfjdfvhXvMKJ7Sukc1iQXZMgnmxJrisOdarHQGUMQMAm2OzIo
+VAPID_PRIVATE_KEY=YOUR_PRIVATE_KEY_HERE
+VAPID_SUBJECT=mailto:you@example.com
+ADMIN_TOKEN=choose-a-secret-token
+APP_URL=https://eli2109.github.io/sagesse-bitachon/

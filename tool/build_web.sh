@@ -17,6 +17,8 @@ fi
 flutter --version
 flutter config --no-analytics --enable-web
 flutter pub get
-flutter build web --release --no-wasm-dry-run
+BASE_HREF="${BASE_HREF:-/}"
+flutter build web --release --no-wasm-dry-run --base-href "$BASE_HREF"
+bash "$ROOT/tool/inject_push_handlers.sh"
 
-echo "Web build ready in build/web"
+echo "Web build ready in build/web (base-href=$BASE_HREF)"

@@ -1,0 +1,18 @@
+{
+  "name": "sagesse-bitachon-push-server",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Web Push reminders every 3 hours for Sagesse Bitachon PWA",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail"
+  },
+  "dependencies": {
+    "web-push": "^3.6.7"
+  },
+  "devDependencies": {
+    "wrangler": "^3.114.0"
+  }
+}

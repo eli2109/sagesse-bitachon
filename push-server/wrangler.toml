@@ -1,0 +1,19 @@
+name = "sagesse-bitachon-push"
+main = "src/index.js"
+compatibility_date = "2026-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Free KV namespace for push subscriptions (create once: npx wrangler kv namespace create SUBSCRIPTIONS)
+# Then paste the id below and uncomment.
+# [[kv_namespaces]]
+# binding = "SUBSCRIPTIONS"
+# id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+[triggers]
+# Every 3 hours (UTC)
+crons = ["0 */3 * * *"]
+
+[vars]
+VAPID_SUBJECT = "mailto:bitachon@example.com"
+# Public key is not secret; private key goes in secrets / .dev.vars
+VAPID_PUBLIC_KEY = "BDOHuJxy-7QveDgDGewF8cj3b9zMjuTl3lpwEfZfjdfvhXvMKJ7Sukc1iQXZMgnmxJrisOdarHQGUMQMAm2OzIo"

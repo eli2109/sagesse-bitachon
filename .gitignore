@@ -54,3 +54,5 @@ push-server/dist/admin-token.txt
 push-server/dist/deploy-payload.json
 push-server/dist/mcp-*.js
 push-server/dist/chunks/
+push-server/dist/mcp-*.js
+push-server/dist/chunks/

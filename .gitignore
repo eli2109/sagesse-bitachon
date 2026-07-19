@@ -56,3 +56,4 @@ push-server/dist/mcp-*.js
 push-server/dist/chunks/
 push-server/dist/mcp-*.js
 push-server/dist/chunks/
+push-server/dist/mcp-*.js

@@ -2,10 +2,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class FontSizeService {
   static const _fontSizeKey = 'font_size';
-  static const double defaultSize = 26;
-  static const double minSize = 18;
-  static const double maxSize = 42;
+  static const double defaultSize = 34;
+  static const double minSize = 24;
+  static const double maxSize = 52;
   static const double step = 2;
+  /// Previous default — migrate smaller saved sizes up for readability.
+  static const double _legacyDefault = 26;
 
   double _fontSize = defaultSize;
 
@@ -13,8 +15,13 @@ class FontSizeService {
 
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
-    _fontSize = prefs.getDouble(_fontSizeKey) ?? defaultSize;
-    _fontSize = _fontSize.clamp(minSize, maxSize);
+    final stored = prefs.getDouble(_fontSizeKey);
+    if (stored == null || stored <= _legacyDefault) {
+      _fontSize = defaultSize;
+      await _save();
+    } else {
+      _fontSize = stored.clamp(minSize, maxSize);
+    }
   }
 
   Future<double> increase() async {

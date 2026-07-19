@@ -29,10 +29,10 @@ class PhraseDisplay extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 24),
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                minHeight: constraints.maxHeight - 40,
+                minHeight: constraints.maxHeight - 48,
                 maxWidth: 480,
               ),
               child: Center(
@@ -41,9 +41,9 @@ class PhraseDisplay extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: textTheme.headlineSmall?.copyWith(
                     fontSize: fontSize,
-                    height: 1.5,
-                    fontWeight: FontWeight.w400,
-                    letterSpacing: 0.15,
+                    height: 1.45,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 0.1,
                     color: isEmpty
                         ? theme.colorScheme.onSurfaceVariant
                         : theme.colorScheme.onSurface,

@@ -29,37 +29,37 @@ class SagesseBitachonApp extends StatelessWidget {
       ),
     );
     return base.copyWith(
-      // Larger, easier-to-tap toolbar icons on mobile.
+      // Large touch targets for phones (thumb-friendly).
       iconButtonTheme: IconButtonThemeData(
         style: IconButton.styleFrom(
-          minimumSize: const Size(48, 48),
-          maximumSize: const Size(56, 56),
-          iconSize: 28,
-          padding: const EdgeInsets.all(10),
+          minimumSize: const Size(56, 56),
+          maximumSize: const Size(64, 64),
+          iconSize: 34,
+          padding: const EdgeInsets.all(12),
           visualDensity: VisualDensity.standard,
           foregroundColor: base.colorScheme.onSurface,
         ),
       ),
       appBarTheme: AppBarTheme(
         centerTitle: true,
-        toolbarHeight: 60,
+        toolbarHeight: 68,
         titleTextStyle: base.textTheme.titleMedium?.copyWith(
           fontWeight: FontWeight.w600,
-          fontSize: 18,
+          fontSize: 20,
           color: base.colorScheme.onSurface,
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          minimumSize: const Size(64, 56),
-          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
+          minimumSize: const Size(64, 68),
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
           textStyle: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.2,
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.3,
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(18),
           ),
         ),
       ),
@@ -210,7 +210,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
   }
 
   /// Max content width so buttons stay proportional on phones & desktops.
-  static const double _contentMaxWidth = 400;
+  static const double _contentMaxWidth = 420;
 
   Widget _toolbarIcon({
     required String tooltip,
@@ -224,11 +224,11 @@ class _ReadingScreenState extends State<ReadingScreen> {
       onPressed: onPressed,
       icon: Icon(icon),
       style: IconButton.styleFrom(
-        minimumSize: const Size(48, 48),
-        iconSize: 28,
+        minimumSize: const Size(56, 56),
+        iconSize: 34,
         foregroundColor: emphasized
             ? scheme.primary
-            : scheme.onSurface.withValues(alpha: onPressed == null ? 0.35 : 0.9),
+            : scheme.onSurface.withValues(alpha: onPressed == null ? 0.35 : 0.95),
       ),
     );
   }
@@ -295,22 +295,22 @@ class _ReadingScreenState extends State<ReadingScreen> {
                       ),
                     ),
                     SafeArea(
-                      minimum: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+                      minimum: const EdgeInsets.fromLTRB(16, 12, 16, 24),
                       child: Column(
                         children: [
                           if (hasPhrases)
                             Padding(
-                              padding: const EdgeInsets.only(bottom: 14),
+                              padding: const EdgeInsets.only(bottom: 18),
                               child: Text(
                                 'Phrase ${_service.displayPosition} / ${_service.cycleLength} dans ce cycle',
                                 textAlign: TextAlign.center,
                                 style: Theme.of(context)
                                     .textTheme
-                                    .bodyMedium
+                                    .bodyLarge
                                     ?.copyWith(
                                       color: scheme.onSurfaceVariant,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w500,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
                                     ),
                               ),
                             ),
@@ -318,21 +318,21 @@ class _ReadingScreenState extends State<ReadingScreen> {
                             child: ConstrainedBox(
                               constraints: const BoxConstraints(
                                 maxWidth: _contentMaxWidth,
-                                minWidth: 220,
+                                minWidth: 260,
                               ),
                               child: SizedBox(
                                 width: double.infinity,
-                                height: 58,
+                                height: 68,
                                 child: FilledButton(
                                   onPressed: hasPhrases && !_isAdvancing
                                       ? _goToNext
                                       : null,
                                   child: _isAdvancing
                                       ? SizedBox(
-                                          width: 24,
-                                          height: 24,
+                                          width: 28,
+                                          height: 28,
                                           child: CircularProgressIndicator(
-                                            strokeWidth: 2.5,
+                                            strokeWidth: 3,
                                             color: scheme.onPrimary,
                                           ),
                                         )

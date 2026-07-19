@@ -26,23 +26,33 @@ class PhraseDisplay extends StatelessWidget {
 
     return GestureDetector(
       onLongPress: phrase == null || phrase!.isEmpty ? null : onCopy,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        child: Center(
-          child: Text(
-            displayText,
-            textAlign: TextAlign.center,
-            style: textTheme.headlineSmall?.copyWith(
-              fontSize: fontSize,
-              height: 1.55,
-              fontWeight: FontWeight.w400,
-              letterSpacing: 0.2,
-              color: isEmpty
-                  ? theme.colorScheme.onSurfaceVariant
-                  : theme.colorScheme.onSurface,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: constraints.maxHeight - 40,
+                maxWidth: 480,
+              ),
+              child: Center(
+                child: Text(
+                  displayText,
+                  textAlign: TextAlign.center,
+                  style: textTheme.headlineSmall?.copyWith(
+                    fontSize: fontSize,
+                    height: 1.5,
+                    fontWeight: FontWeight.w400,
+                    letterSpacing: 0.15,
+                    color: isEmpty
+                        ? theme.colorScheme.onSurfaceVariant
+                        : theme.colorScheme.onSurface,
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }

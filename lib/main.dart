@@ -20,25 +20,59 @@ Future<void> main() async {
 class SagesseBitachonApp extends StatelessWidget {
   const SagesseBitachonApp({super.key});
 
+  static ThemeData _theme(Brightness brightness, Color seed) {
+    final base = ThemeData(
+      useMaterial3: true,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: seed,
+        brightness: brightness,
+      ),
+    );
+    return base.copyWith(
+      // Larger, easier-to-tap toolbar icons on mobile.
+      iconButtonTheme: IconButtonThemeData(
+        style: IconButton.styleFrom(
+          minimumSize: const Size(48, 48),
+          maximumSize: const Size(56, 56),
+          iconSize: 28,
+          padding: const EdgeInsets.all(10),
+          visualDensity: VisualDensity.standard,
+          foregroundColor: base.colorScheme.onSurface,
+        ),
+      ),
+      appBarTheme: AppBarTheme(
+        centerTitle: true,
+        toolbarHeight: 60,
+        titleTextStyle: base.textTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.w600,
+          fontSize: 18,
+          color: base.colorScheme.onSurface,
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          minimumSize: const Size(64, 56),
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
+          textStyle: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.2,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Sagesse du Bitachon',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF1E5A8E),
-          brightness: Brightness.light,
-        ),
-      ),
-      darkTheme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF5B9BD5),
-          brightness: Brightness.dark,
-        ),
-      ),
+      theme: _theme(Brightness.light, const Color(0xFF1E5A8E)),
+      darkTheme: _theme(Brightness.dark, const Color(0xFF5B9BD5)),
       themeMode: ThemeMode.system,
       home: const ReadingScreen(),
     );
@@ -175,10 +209,35 @@ class _ReadingScreenState extends State<ReadingScreen> {
     setState(() {});
   }
 
+  /// Max content width so buttons stay proportional on phones & desktops.
+  static const double _contentMaxWidth = 400;
+
+  Widget _toolbarIcon({
+    required String tooltip,
+    required IconData icon,
+    required VoidCallback? onPressed,
+    bool emphasized = false,
+  }) {
+    final scheme = Theme.of(context).colorScheme;
+    return IconButton(
+      tooltip: tooltip,
+      onPressed: onPressed,
+      icon: Icon(icon),
+      style: IconButton.styleFrom(
+        minimumSize: const Size(48, 48),
+        iconSize: 28,
+        foregroundColor: emphasized
+            ? scheme.primary
+            : scheme.onSurface.withValues(alpha: onPressed == null ? 0.35 : 0.9),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final hasPhrases = _service.cycleLength > 0;
     final currentPhrase = _service.currentPhrase;
+    final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -186,86 +245,108 @@ class _ReadingScreenState extends State<ReadingScreen> {
         centerTitle: true,
         actions: [
           if (kIsWeb)
-            IconButton(
+            _toolbarIcon(
               tooltip: 'Rappels / notifications',
               onPressed: () => showReminderSheet(context),
-              icon: Icon(
-                WebPushService.instance.isEnabled
-                    ? Icons.notifications_active_outlined
-                    : Icons.notifications_none_outlined,
-              ),
+              emphasized: WebPushService.instance.isEnabled,
+              icon: WebPushService.instance.isEnabled
+                  ? Icons.notifications_active
+                  : Icons.notifications_none_outlined,
             ),
-          IconButton(
+          _toolbarIcon(
             tooltip: 'Réduire la police',
             onPressed: _fontSizeService.canDecrease ? _decreaseFontSize : null,
-            icon: const Icon(Icons.text_decrease_outlined),
+            icon: Icons.text_decrease,
           ),
-          IconButton(
+          _toolbarIcon(
             tooltip: 'Augmenter la police',
             onPressed: _fontSizeService.canIncrease ? _increaseFontSize : null,
-            icon: const Icon(Icons.text_increase_outlined),
+            icon: Icons.text_increase,
           ),
           if (hasPhrases)
-            IconButton(
+            _toolbarIcon(
               tooltip: 'Copier la phrase',
               onPressed: _copyCurrentPhrase,
-              icon: const Icon(Icons.copy_outlined),
+              icon: Icons.copy_rounded,
             ),
           if (hasPhrases)
-            IconButton(
+            _toolbarIcon(
               tooltip: 'Nouveau cycle',
               onPressed: _startNewCycle,
-              icon: const Icon(Icons.shuffle),
+              icon: Icons.shuffle_rounded,
             ),
+          const SizedBox(width: 4),
         ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Expanded(
-                  child: Center(
-                    child: PhraseDisplay(
-                      phrase: currentPhrase,
-                      isEmpty: !hasPhrases,
-                      onCopy: _copyCurrentPhrase,
-                      fontSize: _fontSizeService.fontSize,
-                    ),
-                  ),
-                ),
-                SafeArea(
-                  minimum: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-                  child: Column(
-                    children: [
-                      if (hasPhrases)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: Text(
-                            'Phrase ${_service.displayPosition} / ${_service.cycleLength} dans ce cycle',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                ),
-                          ),
-                        ),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 52,
-                        child: FilledButton(
-                          onPressed:
-                              hasPhrases && !_isAdvancing ? _goToNext : null,
-                          child: _isAdvancing
-                              ? const SizedBox(
-                                  width: 22,
-                                  height: 22,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
-                                )
-                              : const Text('Suivant'),
-                        ),
+          : Align(
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: _contentMaxWidth + 48),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: PhraseDisplay(
+                        phrase: currentPhrase,
+                        isEmpty: !hasPhrases,
+                        onCopy: _copyCurrentPhrase,
+                        fontSize: _fontSizeService.fontSize,
                       ),
-                    ],
-                  ),
+                    ),
+                    SafeArea(
+                      minimum: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+                      child: Column(
+                        children: [
+                          if (hasPhrases)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 14),
+                              child: Text(
+                                'Phrase ${_service.displayPosition} / ${_service.cycleLength} dans ce cycle',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(
+                                      color: scheme.onSurfaceVariant,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                              ),
+                            ),
+                          Center(
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(
+                                maxWidth: _contentMaxWidth,
+                                minWidth: 220,
+                              ),
+                              child: SizedBox(
+                                width: double.infinity,
+                                height: 58,
+                                child: FilledButton(
+                                  onPressed: hasPhrases && !_isAdvancing
+                                      ? _goToNext
+                                      : null,
+                                  child: _isAdvancing
+                                      ? SizedBox(
+                                          width: 24,
+                                          height: 24,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.5,
+                                            color: scheme.onPrimary,
+                                          ),
+                                        )
+                                      : const Text('Suivant'),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
     );
   }

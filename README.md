@@ -58,6 +58,21 @@ Sur **iPhone** : ouvre le lien dans Safari. Optionnel : Partager → **Sur l'éc
 1. Édite `assets/phrases.json` (tableau JSON de chaînes).
 2. Rebuild / redéploie.
 
+## Rappels iOS (PWA + Web Push)
+
+Sur iPhone, les rappels **toutes les 3 h** passent par :
+
+1. **Ajouter à l’écran d’accueil** (Safari → Partager → Sur l’écran d’accueil)
+2. Ouvrir l’app **depuis l’icône** (pas depuis un onglet Safari)
+3. Icône **cloche** → **Activer les rappels**
+4. Un **serveur Web Push** qui envoie le rappel (Cloudflare Worker, gratuit) — voir `push-server/README.md`
+
+Sans l’étape 4 (`apiBaseUrl` dans `assets/push_config.json`), l’UI explique que le serveur n’est pas configuré.
+
+Exigences Apple : **iOS 16.4+**, PWA installée, permission notifications acceptée.
+
+App en ligne : https://eli2109.github.io/sagesse-bitachon/
+
 ## Fonctionnalités
 
 - Affichage d'une phrase à la fois
@@ -68,7 +83,8 @@ Sur **iPhone** : ouvre le lien dans Safari. Optionnel : Partager → **Sur l'éc
 - Taille de police réglable (mémorisée)
 - Thème Material 3 clair/sombre
 - Message de bienvenue à la première ouverture
-- (Android natif uniquement) rappels locaux toutes les 3 h
+- Rappels Web Push PWA (iOS Home Screen / navigateurs compatibles) via cloche + `push-server`
+- (Android natif) rappels locaux toutes les 3 h
 
 ## Structure
 

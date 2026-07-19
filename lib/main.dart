@@ -29,37 +29,17 @@ class SagesseBitachonApp extends StatelessWidget {
       ),
     );
     return base.copyWith(
-      // Large touch targets for phones (thumb-friendly).
-      iconButtonTheme: IconButtonThemeData(
-        style: IconButton.styleFrom(
-          minimumSize: const Size(56, 56),
-          maximumSize: const Size(64, 64),
-          iconSize: 34,
-          padding: const EdgeInsets.all(12),
-          visualDensity: VisualDensity.standard,
-          foregroundColor: base.colorScheme.onSurface,
-        ),
-      ),
-      appBarTheme: AppBarTheme(
-        centerTitle: true,
-        toolbarHeight: 68,
-        titleTextStyle: base.textTheme.titleMedium?.copyWith(
-          fontWeight: FontWeight.w600,
-          fontSize: 20,
-          color: base.colorScheme.onSurface,
-        ),
-      ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          minimumSize: const Size(64, 68),
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
+          minimumSize: const Size(64, 72),
+          padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 20),
           textStyle: const TextStyle(
-            fontSize: 22,
+            fontSize: 24,
             fontWeight: FontWeight.w700,
             letterSpacing: 0.3,
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(20),
           ),
         ),
       ),
@@ -210,7 +190,9 @@ class _ReadingScreenState extends State<ReadingScreen> {
   }
 
   /// Max content width so buttons stay proportional on phones & desktops.
-  static const double _contentMaxWidth = 420;
+  static const double _contentMaxWidth = 440;
+  static const double _iconSize = 36;
+  static const double _iconTap = 60;
 
   Widget _toolbarIcon({
     required String tooltip,
@@ -219,16 +201,95 @@ class _ReadingScreenState extends State<ReadingScreen> {
     bool emphasized = false,
   }) {
     final scheme = Theme.of(context).colorScheme;
-    return IconButton(
-      tooltip: tooltip,
-      onPressed: onPressed,
-      icon: Icon(icon),
-      style: IconButton.styleFrom(
-        minimumSize: const Size(56, 56),
-        iconSize: 34,
-        foregroundColor: emphasized
-            ? scheme.primary
-            : scheme.onSurface.withValues(alpha: onPressed == null ? 0.35 : 0.95),
+    final enabled = onPressed != null;
+    final color = emphasized
+        ? scheme.primary
+        : scheme.onSurface.withValues(alpha: enabled ? 0.92 : 0.32);
+
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: emphasized
+            ? scheme.primaryContainer.withValues(alpha: 0.55)
+            : Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(16),
+          child: SizedBox(
+            width: _iconTap,
+            height: _iconTap,
+            child: Icon(icon, size: _iconSize, color: color),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _mobileHeader(bool hasPhrases) {
+    final scheme = Theme.of(context).colorScheme;
+    return Material(
+      elevation: 0.5,
+      color: scheme.surface,
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(8, 6, 8, 10),
+          child: Column(
+            children: [
+              Text(
+                'Sagesse du Bitachon',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  color: scheme.onSurface,
+                  letterSpacing: 0.1,
+                ),
+              ),
+              const SizedBox(height: 8),
+              // Full-width row: icons stay large (AppBar was crushing them).
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  if (kIsWeb)
+                    _toolbarIcon(
+                      tooltip: 'Rappels / notifications',
+                      onPressed: () => showReminderSheet(context),
+                      emphasized: WebPushService.instance.isEnabled,
+                      icon: WebPushService.instance.isEnabled
+                          ? Icons.notifications_active
+                          : Icons.notifications_none_outlined,
+                    ),
+                  _toolbarIcon(
+                    tooltip: 'Réduire la police',
+                    onPressed:
+                        _fontSizeService.canDecrease ? _decreaseFontSize : null,
+                    icon: Icons.text_decrease,
+                  ),
+                  _toolbarIcon(
+                    tooltip: 'Augmenter la police',
+                    onPressed:
+                        _fontSizeService.canIncrease ? _increaseFontSize : null,
+                    icon: Icons.text_increase,
+                  ),
+                  if (hasPhrases)
+                    _toolbarIcon(
+                      tooltip: 'Copier la phrase',
+                      onPressed: _copyCurrentPhrase,
+                      icon: Icons.copy_rounded,
+                    ),
+                  if (hasPhrases)
+                    _toolbarIcon(
+                      tooltip: 'Nouveau cycle',
+                      onPressed: _startNewCycle,
+                      icon: Icons.shuffle_rounded,
+                    ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -240,53 +301,18 @@ class _ReadingScreenState extends State<ReadingScreen> {
     final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sagesse du Bitachon'),
-        centerTitle: true,
-        actions: [
-          if (kIsWeb)
-            _toolbarIcon(
-              tooltip: 'Rappels / notifications',
-              onPressed: () => showReminderSheet(context),
-              emphasized: WebPushService.instance.isEnabled,
-              icon: WebPushService.instance.isEnabled
-                  ? Icons.notifications_active
-                  : Icons.notifications_none_outlined,
-            ),
-          _toolbarIcon(
-            tooltip: 'Réduire la police',
-            onPressed: _fontSizeService.canDecrease ? _decreaseFontSize : null,
-            icon: Icons.text_decrease,
-          ),
-          _toolbarIcon(
-            tooltip: 'Augmenter la police',
-            onPressed: _fontSizeService.canIncrease ? _increaseFontSize : null,
-            icon: Icons.text_increase,
-          ),
-          if (hasPhrases)
-            _toolbarIcon(
-              tooltip: 'Copier la phrase',
-              onPressed: _copyCurrentPhrase,
-              icon: Icons.copy_rounded,
-            ),
-          if (hasPhrases)
-            _toolbarIcon(
-              tooltip: 'Nouveau cycle',
-              onPressed: _startNewCycle,
-              icon: Icons.shuffle_rounded,
-            ),
-          const SizedBox(width: 4),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Align(
-              alignment: Alignment.topCenter,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: _contentMaxWidth + 48),
-                child: Column(
-                  children: [
-                    Expanded(
+      body: Column(
+        children: [
+          _mobileHeader(hasPhrases && !_isLoading),
+          Expanded(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : Align(
+                    alignment: Alignment.topCenter,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: _contentMaxWidth + 40,
+                      ),
                       child: PhraseDisplay(
                         phrase: currentPhrase,
                         isEmpty: !hasPhrases,
@@ -294,60 +320,57 @@ class _ReadingScreenState extends State<ReadingScreen> {
                         fontSize: _fontSizeService.fontSize,
                       ),
                     ),
-                    SafeArea(
-                      minimum: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-                      child: Column(
-                        children: [
-                          if (hasPhrases)
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 18),
-                              child: Text(
-                                'Phrase ${_service.displayPosition} / ${_service.cycleLength} dans ce cycle',
-                                textAlign: TextAlign.center,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge
-                                    ?.copyWith(
-                                      color: scheme.onSurfaceVariant,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                              ),
-                            ),
-                          Center(
-                            child: ConstrainedBox(
-                              constraints: const BoxConstraints(
-                                maxWidth: _contentMaxWidth,
-                                minWidth: 260,
-                              ),
-                              child: SizedBox(
-                                width: double.infinity,
-                                height: 68,
-                                child: FilledButton(
-                                  onPressed: hasPhrases && !_isAdvancing
-                                      ? _goToNext
-                                      : null,
-                                  child: _isAdvancing
-                                      ? SizedBox(
-                                          width: 28,
-                                          height: 28,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 3,
-                                            color: scheme.onPrimary,
-                                          ),
-                                        )
-                                      : const Text('Suivant'),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                  ),
+          ),
+          if (!_isLoading)
+            SafeArea(
+              minimum: const EdgeInsets.fromLTRB(16, 10, 16, 20),
+              child: Column(
+                children: [
+                  if (hasPhrases)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Text(
+                        'Phrase ${_service.displayPosition} / ${_service.cycleLength} dans ce cycle',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: scheme.onSurfaceVariant,
+                          fontSize: 19,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
-                  ],
-                ),
+                  Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: _contentMaxWidth,
+                        minWidth: 280,
+                      ),
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 72,
+                        child: FilledButton(
+                          onPressed:
+                              hasPhrases && !_isAdvancing ? _goToNext : null,
+                          child: _isAdvancing
+                              ? SizedBox(
+                                  width: 30,
+                                  height: 30,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 3,
+                                    color: scheme.onPrimary,
+                                  ),
+                                )
+                              : const Text('Suivant'),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
+        ],
+      ),
     );
   }
 }

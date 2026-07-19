@@ -2,12 +2,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class FontSizeService {
   static const _fontSizeKey = 'font_size';
-  static const double defaultSize = 34;
-  static const double minSize = 24;
-  static const double maxSize = 52;
+  static const double defaultSize = 38;
+  static const double minSize = 28;
+  static const double maxSize = 56;
   static const double step = 2;
-  /// Previous default — migrate smaller saved sizes up for readability.
-  static const double _legacyDefault = 26;
+  /// Previous defaults — migrate smaller saved sizes up for readability.
+  static const double _legacyDefault = 34;
 
   double _fontSize = defaultSize;
 
